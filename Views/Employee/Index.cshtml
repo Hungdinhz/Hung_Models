@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Danh sách nhân viên";
+    var employees = ViewBag.Employees;
 }
 
 <h2 class="mb-3">@ViewData["Title"]</h2>
@@ -25,7 +26,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in employees)
         {
             <tr>
                 <td>@item.FullName</td>

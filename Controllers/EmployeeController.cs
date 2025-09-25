@@ -24,7 +24,8 @@ namespace Hung_Models.Controllers
 
         public IActionResult Index()
         {
-            return View(employees);
+            ViewBag.Employees = employees;
+            return View();
         }
 
         public IActionResult Details(int id)
