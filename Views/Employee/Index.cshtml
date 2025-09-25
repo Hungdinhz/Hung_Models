@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Hung_Models.Models.Employee>
+
+@{
+    ViewData["Title"] = "Danh sách nhân viên";
+}
+
+<h2 class="mb-3">@ViewData["Title"]</h2>
+
+<p>
+    <a class="btn btn-success mb-3" asp-action="Create">
+        <i class="bi bi-person-plus"></i> Thêm nhân viên
+    </a>
+</p>
+
+<table class="table table-bordered table-striped table-hover align-middle">
+    <thead class="table-dark text-center">
+        <tr>
+            <th>Họ tên</th>
+            <th>Giới tính</th>
+            <th>SĐT</th>
+            <th>Email</th>
+            <th>Lương</th>
+            <th>Trạng thái</th>
+            <th>Chức năng</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FullName</td>
+                <td>@item.Gender</td>
+                <td>@item.Phone</td>
+                <td>@item.Email</td>
+                <td>@string.Format("{0:N0} đ", item.Salary)</td>
+                <td>
+                    @if (item.Status)
+                    {
+                        <span class="badge bg-success">Đang làm</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Nghỉ</span>
+                    }
+                </td>
+                <td class="text-center">
+                    <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.Id">
+                        <i class="bi bi-eye"></i> Xem
+                    </a>
+                    <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@item.Id">
+                        <i class="bi bi-pencil-square"></i> Sửa
+                    </a>
+                    <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.Id">
+                        <i class="bi bi-trash"></i> Xoá
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
