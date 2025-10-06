@@ -1,4 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Dang ky DbContext vao DI container
+builder.Services.AddDbContext<Hung_Models.Models.LapTrinhWebBanHangContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LapTrinhWebBanHangContext"))
+    );
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
