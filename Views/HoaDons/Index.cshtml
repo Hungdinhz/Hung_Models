@@ -1,0 +1,124 @@
+﻿@model IEnumerable<Hung_Models.Models.HoaDon>
+
+@{
+    ViewData["Title"] = "Danh Sách Hóa Đơn";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h2 class="text-primary fw-bold"><i class="bi bi-receipt-cutoff"></i> @ViewData["Title"]</h2>
+        <a asp-action="Create" class="btn btn-success btn-lg shadow-sm">
+            <i class="bi bi-plus-circle-fill"></i> Tạo Hóa Đơn Mới
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover align-middle shadow-lg rounded">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th scope="col" style="width: 10%;">Mã HĐ</th>
+                    <th scope="col" class="d-none d-md-table-cell" style="width: 10%;">Ngày Lập</th>
+                    <th scope="col" style="width: 15%;">Khách Hàng</th>
+                    <th scope="col" class="d-none d-lg-table-cell" style="width: 10%;">Điện Thoại</th>
+                    <th scope="col" style="width: 15%;">Tổng Trị Giá</th>
+                    <th scope="col" style="width: 15%;">Trạng Thái</th>
+                    <th scope="col" style="width: 10%;">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="text-center fw-bold">@item.MaHoaDon</td>
+
+                        @* Ẩn trên màn hình nhỏ *@
+                        <td class="d-none d-md-table-cell text-center">
+                            @(item.NgayHoaDon.HasValue ? item.NgayHoaDon.Value.ToString("dd/MM/yyyy") : "N/A")
+                        </td>
+
+                        <td>
+                            <strong class="text-dark">@item.HoTenKhachHang</strong><br />
+                            <small class="text-muted">(@(item.MaKhaHangNavigation?.HoTenKhachHang ?? "Khách vãng lai"))</small>
+                        </td>
+
+                        @* Ẩn trên màn hình trung bình *@
+                        <td class="d-none d-lg-table-cell text-center">@item.DienThoai</td>
+
+                        <td class="text-end fw-bold text-success">
+                            @* Định dạng tiền tệ VNĐ *@
+                            @if (item.TongTriGia.HasValue)
+                            {
+                                @string.Format("{0:N0} đ", item.TongTriGia)
+                            }
+                            else
+                            {
+                                <span>0 đ</span>
+                            }
+                        </td>
+
+                        <td class="text-center">
+                            @* Hiển thị Trạng Thái bằng Badge *@
+                            @{
+                                string badgeClass;
+                                string statusText;
+                                switch (item.TrangThai)
+                                {
+                                    case 0:
+                                        badgeClass = "warning text-dark";
+                                        statusText = "Chờ xử lý";
+                                        break;
+                                    case 1:
+                                        badgeClass = "info text-dark";
+                                        statusText = "Đã xác nhận";
+                                        break;
+                                    case 2:
+                                        badgeClass = "primary";
+                                        statusText = "Đang giao";
+                                        break;
+                                    case 3:
+                                        badgeClass = "success";
+                                        statusText = "Hoàn thành";
+                                        break;
+                                    case 4:
+                                        badgeClass = "danger";
+                                        statusText = "Đã hủy";
+                                        break;
+                                    default:
+                                        badgeClass = "secondary";
+                                        statusText = "Không rõ";
+                                        break;
+                                }
+                            }
+                            <span class="badge bg-@badgeClass p-2">@statusText</span>
+                        </td>
+
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning" data-bs-toggle="tooltip" title="Sửa">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info text-white" data-bs-toggle="tooltip" title="Chi tiết">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" data-bs-toggle="tooltip" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <script>
+        // Script để kích hoạt Tooltips
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip()
+        })
+    </script>
+}
