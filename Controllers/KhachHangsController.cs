@@ -9,23 +9,22 @@ using Hung_Models.Models;
 
 namespace Hung_Models.Controllers
 {
-    public class HoaDonsController : Controller
+    public class KhachHangsController : Controller
     {
-        private readonly LapTrinhWebBanHangContext _context;
+        private readonly pdhDbContext _context;
 
-        public HoaDonsController(LapTrinhWebBanHangContext context)
+        public KhachHangsController(pdhDbContext context)
         {
             _context = context;
         }
 
-        // GET: HoaDons
+        // GET: KhachHangs
         public async Task<IActionResult> Index()
         {
-            var lapTrinhWebBanHangContext = _context.HoaDons.Include(h => h.MaKhaHangNavigation);
-            return View(await lapTrinhWebBanHangContext.ToListAsync());
+            return View(await _context.KhachHangs.ToListAsync());
         }
 
-        // GET: HoaDons/Details/5
+        // GET: KhachHangs/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,42 +32,44 @@ namespace Hung_Models.Controllers
                 return NotFound();
             }
 
-            var hoaDon = await _context.HoaDons
-                .Include(h => h.MaKhaHangNavigation)
+            var khachHang = await _context.KhachHangs
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (hoaDon == null)
+            if (khachHang == null)
             {
                 return NotFound();
             }
 
-            return View(hoaDon);
+            return View(khachHang);
         }
 
-        // GET: HoaDons/Create
+        // GET: KhachHangs/Create
         public IActionResult Create()
         {
-            ViewData["MaKhaHang"] = new SelectList(_context.KhachHangs, "Id", "Id");
             return View();
         }
 
-        // POST: HoaDons/Create
+        // POST: KhachHangs/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MaHoaDon,MaKhaHang,NgayHoaDon,NgayNhan,HoTenKhachHang,Email,DienThoai,DiaChi,TongTriGia,TrangThai")] HoaDon hoaDon)
+        public async Task<IActionResult> Create([Bind("Id,MaKhachHang,HoTenKhachHang,Email,MaKhau,DienThoai,DiaChi,NgayDangKy,TrangThai")] KhachHang khachHang)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(hoaDon);
+                // FIX lỗi PostgreSQL phải dùng UTC
+                if (khachHang.NgayDangKy != null)
+                {
+                    khachHang.NgayDangKy = DateTime.SpecifyKind(khachHang.NgayDangKy.Value, DateTimeKind.Utc);
+                }
+                _context.Add(khachHang);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaKhaHang"] = new SelectList(_context.KhachHangs, "Id", "Id", hoaDon.MaKhaHang);
-            return View(hoaDon);
+            return View(khachHang);
         }
 
-        // GET: HoaDons/Edit/5
+        // GET: KhachHangs/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,23 +77,22 @@ namespace Hung_Models.Controllers
                 return NotFound();
             }
 
-            var hoaDon = await _context.HoaDons.FindAsync(id);
-            if (hoaDon == null)
+            var khachHang = await _context.KhachHangs.FindAsync(id);
+            if (khachHang == null)
             {
                 return NotFound();
             }
-            ViewData["MaKhaHang"] = new SelectList(_context.KhachHangs, "Id", "Id", hoaDon.MaKhaHang);
-            return View(hoaDon);
+            return View(khachHang);
         }
 
-        // POST: HoaDons/Edit/5
+        // POST: KhachHangs/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MaHoaDon,MaKhaHang,NgayHoaDon,NgayNhan,HoTenKhachHang,Email,DienThoai,DiaChi,TongTriGia,TrangThai")] HoaDon hoaDon)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,MaKhachHang,HoTenKhachHang,Email,MaKhau,DienThoai,DiaChi,NgayDangKy,TrangThai")] KhachHang khachHang)
         {
-            if (id != hoaDon.Id)
+            if (id != khachHang.Id)
             {
                 return NotFound();
             }
@@ -101,12 +101,17 @@ namespace Hung_Models.Controllers
             {
                 try
                 {
-                    _context.Update(hoaDon);
+                    // FIX lỗi PostgreSQL phải dùng UTC
+                    if (khachHang.NgayDangKy != null)
+                    {
+                        khachHang.NgayDangKy = DateTime.SpecifyKind(khachHang.NgayDangKy.Value, DateTimeKind.Utc);
+                    }
+                    _context.Update(khachHang);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!HoaDonExists(hoaDon.Id))
+                    if (!KhachHangExists(khachHang.Id))
                     {
                         return NotFound();
                     }
@@ -117,11 +122,10 @@ namespace Hung_Models.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MaKhaHang"] = new SelectList(_context.KhachHangs, "Id", "Id", hoaDon.MaKhaHang);
-            return View(hoaDon);
+            return View(khachHang);
         }
 
-        // GET: HoaDons/Delete/5
+        // GET: KhachHangs/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -129,35 +133,34 @@ namespace Hung_Models.Controllers
                 return NotFound();
             }
 
-            var hoaDon = await _context.HoaDons
-                .Include(h => h.MaKhaHangNavigation)
+            var khachHang = await _context.KhachHangs
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (hoaDon == null)
+            if (khachHang == null)
             {
                 return NotFound();
             }
 
-            return View(hoaDon);
+            return View(khachHang);
         }
 
-        // POST: HoaDons/Delete/5
+        // POST: KhachHangs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var hoaDon = await _context.HoaDons.FindAsync(id);
-            if (hoaDon != null)
+            var khachHang = await _context.KhachHangs.FindAsync(id);
+            if (khachHang != null)
             {
-                _context.HoaDons.Remove(hoaDon);
+                _context.KhachHangs.Remove(khachHang);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool HoaDonExists(int id)
+        private bool KhachHangExists(int id)
         {
-            return _context.HoaDons.Any(e => e.Id == id);
+            return _context.KhachHangs.Any(e => e.Id == id);
         }
     }
 }

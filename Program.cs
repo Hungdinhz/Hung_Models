@@ -1,11 +1,18 @@
 using Microsoft.EntityFrameworkCore;
+using Hung_Models.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Dang ky DbContext vao DI container
-builder.Services.AddDbContext<Hung_Models.Models.LapTrinhWebBanHangContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LapTrinhWebBanHangContext"))
-    );
+//builder.Services.AddDbContext<Hung_Models.Models.LapTrinhWebBanHangContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("LapTrinhWebBanHangContext"))
+//    );
+
+// Dung PostgreSQL
+builder.Services.AddDbContext<pdhDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ServerConnection"))
+);
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
